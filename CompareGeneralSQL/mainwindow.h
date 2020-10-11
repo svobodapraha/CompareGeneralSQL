@@ -1,0 +1,151 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+
+#include <QMainWindow>
+#include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
+#include <QHostInfo>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlTableModel>
+#include <QSqlQueryModel>
+#include <QSqlError>
+#include <QListWidgetItem>
+
+
+#include "xlsxdocument.h"
+#include "xlsxchartsheet.h"
+#include "xlsxcellrange.h"
+#include "xlsxchart.h"
+#include "xlsxrichstring.h"
+#include "xlsxworkbook.h"
+
+
+#include "managequeris.h"
+#include <windows.h>
+
+
+using namespace QXlsx;
+
+namespace Ui {
+class MainWindow;
+}
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QStringList arguments,QWidget *parent = 0);
+    ~MainWindow();
+
+    bool boBatchProcessing;
+    int iExitCode;
+
+signals:
+    void startBatchProcessing(int iID);
+
+
+private slots:
+    void on_btnWrite_clicked();
+
+    void on_btnNewReq_clicked();
+
+    void on_btnOldReq_clicked();
+
+    void on_btnCompare_clicked();
+
+    void on_btn_Debug_clicked();
+
+    void on_lineEdit_NewReq_textEdited(const QString &arg1);
+
+    void on_lineEdit_OldReq_textEdited(const QString &arg1);
+
+    int batchProcessing(int iID);
+
+    void on_btn_ExecQuery_clicked();
+
+    void on_listWidget_Commands_itemClicked(QListWidgetItem *item);
+
+    void on_listWidget_oldColumns_itemClicked(QListWidgetItem *item);
+
+    void on_listWidget_newColumns_itemClicked(QListWidgetItem *item);
+
+    void on_btn_ClearQueryLine_clicked();
+
+    void on_btn_ManageQueries_clicked();
+
+private:
+    Ui::MainWindow *ui;
+
+private:
+    QString fileName_NewReq, asNewSheetName;
+    QString fileName_OldReq, asOldSheetName;
+    QString fileName_OldReqCor;
+    QString newReqFileLastPath;
+    QString oldReqFileLastPath;
+    QString fileName_Report;
+    QString asCompareCondition;
+    QString asQueryTextToReport;
+
+
+    QSettings *iniSettings;
+    void EmptyChangesTable();
+    ManageQueris *manageStoredQueries;
+
+    void setChangesTableNotEditable();
+    void checkAll(bool boCheck);
+
+    QString asUserAndHostName;
+    QStringList comLineArgList;
+
+//sql stuff
+    QSqlDatabase db_Req;
+    bool boGenResult;
+    QSqlTableModel *modelNew;
+    QSqlTableModel *modelOld;
+    QSqlQueryModel *modelUserQuery;
+    void addTextToQueryLine(QString asToAdd);
+
+
+};
+
+
+#define kn_HeaderRow      1
+#define kn_FistDataRow    2
+#define kn_ReqIDCol       1
+#define kn_FirstHeaderCol 2
+
+#define col_infotable_check_box         0
+#define col_infotable_requirement       1
+#define col_infotable_req_short         2
+#define col_infotable_status            3
+#define col_infotable_par_name          4
+#define col_infotable_old_value         5
+#define col_infotable_new_value         6
+#define col_infotable_user_comment      7
+#define col_infotable_origID            8
+
+
+#define kn_ReportFirstInfoRow           1
+
+#define knBatchProcessingID  1
+
+#define knExitStatusBadSignal               1
+#define knExitStatusReporFileOpened         2
+#define knExitStatusInvalidInputFilenames   3
+#define knExitStatusCannotLoadInputFiles    4
+#define knExitStatusNoResultDoc             5
+#define knExitStatusCorrectedFileOpened     6
+#define knExitStatusCannotLoadInputCsvFiles 7
+
+#define knOrigIDText     ("Original Old ID")
+#define knMAX_VIEW_COLUMN_WIDTH            400
+#define WIN_MERGE_LOCATION   "c:\\Program Files (x86)\\WinMerge\\WinMergeU.exe"
+
+
+
+#endif // MAINWINDOW_H
